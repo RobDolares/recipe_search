@@ -3,11 +3,13 @@ let search = document.querySelector("#qBar");
 
 
 function query() {
-document.querySelector("#currentQuery").innerHTML = `${search.value}`;
-//Need to clear result field before re-populating with search results:
+  document.querySelector("#currentQuery").innerHTML = `${search.value} dishes`; // Show on page current search query
+
+  //Need to clear result field before re-populating with search results:
+  resultSection.innerHTML = "";
 
 
-fetch(`https://crossorigin.me/http://www.recipepuppy.com/api/?q=${search.value}`)
+  fetch(`https://crossorigin.me/http://www.recipepuppy.com/api/?q=${search.value}`)
 
     .then(function(response) {
       if (response.status === 200) {
@@ -15,19 +17,33 @@ fetch(`https://crossorigin.me/http://www.recipepuppy.com/api/?q=${search.value}`
       }
     })
 
-//Populating with template literals per search query results
-
+    //Populating with template literals per search query results
     .then(function(data) {
       let results = data.results;
       for (var i = 0; i < results.length; i++) {
-        resultSection.innerHTML += `
-          <div class="singleResult">
-            <div class="imgContainer">
-              <a href="${results[i].href}"><img src="${results[i].thumbnail}"></a>
+        if (results[i].thumbnail !== "") {
+          resultSection.innerHTML += `
+            <div class="singleResult">
+              <a href="${results[i].href}">
+                <div class="imgContainer">
+                  <img src="${results[i].thumbnail}">
+                </div>
+                <p>${results[i].title}</p>
+              </a>
             </div>
-            <p>${results[i].title}</p>
-          </div>
-        `
+          `
+        } else {
+          resultSection.innerHTML += `
+            <div class="singleResult">
+              <a href="${results[i].href}">
+                <div class="imgContainer">
+                  <p class="noImgMsg" >Sorry, No Image</p>
+                </div>
+                <p>${results[i].title}</p>
+              </a>
+            </div>
+          `
+        }
       }
     });
 }
